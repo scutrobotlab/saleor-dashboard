@@ -12,6 +12,11 @@ const AddressFormatter = ({ address, fontSize }: AddressFormatterProps) => {
     return <Skeleton />;
   }
 
+  const isChina = address.country?.code === "CN";
+  const nameLine = isChina
+    ? `${address.lastName ?? ""}${address.firstName ?? ""}`.trim()
+    : `${address.firstName ?? ""} ${address.lastName ?? ""}`.trim();
+
   return (
     <address
       data-test-id="address"
@@ -20,7 +25,7 @@ const AddressFormatter = ({ address, fontSize }: AddressFormatterProps) => {
       }}
     >
       <Text as="p" data-test-id="name" size={fontSize}>
-        {address.firstName} {address.lastName}
+        {nameLine}
       </Text>
       <Text as="p" data-test-id="phone" size={fontSize}>
         {address.phone}
@@ -30,21 +35,43 @@ const AddressFormatter = ({ address, fontSize }: AddressFormatterProps) => {
           {address.companyName}
         </Text>
       )}
-      <Text as="p" data-test-id="addressLines" size={fontSize}>
-        {address.streetAddress1}
-        <br />
-        {address.streetAddress2}
-      </Text>
-      <Text as="p" data-test-id="postal-code-and-city" size={fontSize}>
-        {" "}
-        {address.postalCode} {address.city}
-        {address.cityArea ? ", " + address.cityArea : ""}
-      </Text>
-      <Text as="p" data-test-id="country-area-and-country" size={fontSize}>
-        {address.countryArea
-          ? address.countryArea + ", " + address.country.country
-          : address.country.country}
-      </Text>
+      {isChina ? (
+        <>
+          <Text as="p" data-test-id="country" size={fontSize}>
+            {address.country?.country}
+          </Text>
+          <Text as="p" data-test-id="region-line" size={fontSize}>
+            {[address.countryArea, address.city, address.cityArea].filter(Boolean).join(" ")}
+          </Text>
+          <Text as="p" data-test-id="addressLines" size={fontSize}>
+            {address.streetAddress1}
+            {address.streetAddress2 ? (
+              <>
+                <br />
+                {address.streetAddress2}
+              </>
+            ) : null}
+          </Text>
+        </>
+      ) : (
+        <>
+          <Text as="p" data-test-id="addressLines" size={fontSize}>
+            {address.streetAddress1}
+            <br />
+            {address.streetAddress2}
+          </Text>
+          <Text as="p" data-test-id="postal-code-and-city" size={fontSize}>
+            {" "}
+            {address.postalCode} {address.city}
+            {address.cityArea ? ", " + address.cityArea : ""}
+          </Text>
+          <Text as="p" data-test-id="country-area-and-country" size={fontSize}>
+            {address.countryArea
+              ? address.countryArea + ", " + address.country.country
+              : address.country.country}
+          </Text>
+        </>
+      )}
     </address>
   );
 };

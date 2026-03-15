@@ -1,7 +1,6 @@
 // @ts-strict-ignore
 import { type AddressTypeInput } from "@dashboard/customers/types";
 import { type AccountErrorFragment, type OrderErrorFragment } from "@dashboard/graphql";
-import { commonMessages } from "@dashboard/intl";
 import { getFormErrors } from "@dashboard/utils/errors";
 import { Box, Combobox, Input, type Option } from "@saleor/macaw-ui-next";
 import { type ChangeEvent } from "react";
@@ -47,57 +46,27 @@ export const AddressEdit = (props: AddressEditProps) => {
 
   return (
     <>
+      {/* 先收件人 → 联系方式 → 最后地址（从大到小） */}
+      <Input
+        disabled={disabled}
+        data-test-id="first-name-input"
+        error={!!formErrors.firstName}
+        helperText={getErrorMessage(formErrors.firstName, intl)}
+        label={intl.formatMessage({
+          id: "6YyMOz",
+          defaultMessage: "收件人",
+        })}
+        name="firstName"
+        onChange={e => {
+          onChange(e);
+          onChange({ target: { name: "lastName", value: "" } } as React.ChangeEvent<any>);
+        }}
+        value={`${data.lastName ?? ""}${data.firstName ?? ""}`.trim() || (data.firstName ?? "")}
+        width="100%"
+        spellCheck={false}
+        autoComplete="new-password"
+      />
       <Box display="grid" gap={2} __gridTemplateColumns="1fr 1fr">
-        <div>
-          <Input
-            disabled={disabled}
-            data-test-id="first-name-input"
-            error={!!formErrors.firstName}
-            helperText={getErrorMessage(formErrors.firstName, intl)}
-            label={intl.formatMessage(commonMessages.firstName)}
-            name="firstName"
-            onChange={onChange}
-            value={data.firstName}
-            width="100%"
-            spellCheck={false}
-            autoComplete="new-password"
-          />
-        </div>
-        <div>
-          <Input
-            disabled={disabled}
-            data-test-id="last-name-input"
-            error={!!formErrors.lastName}
-            helperText={getErrorMessage(formErrors.lastName, intl)}
-            label={intl.formatMessage(commonMessages.lastName)}
-            name="lastName"
-            onChange={onChange}
-            value={data.lastName}
-            width="100%"
-            spellCheck={false}
-            autoComplete="new-password"
-          />
-        </div>
-      </Box>
-      <Box display="grid" gap={2} __gridTemplateColumns="1fr 1fr">
-        <div>
-          <Input
-            data-test-id="company-name-input"
-            disabled={disabled}
-            error={!!formErrors.companyName}
-            helperText={getErrorMessage(formErrors.companyName, intl)}
-            label={intl.formatMessage({
-              id: "9YazHG",
-              defaultMessage: "Company",
-            })}
-            name="companyName"
-            onChange={onChange}
-            value={data.companyName}
-            width="100%"
-            spellCheck={false}
-            autoComplete="new-password"
-          />
-        </div>
         <div>
           <Input
             disabled={disabled}
@@ -116,7 +85,139 @@ export const AddressEdit = (props: AddressEditProps) => {
             autoComplete="new-password"
           />
         </div>
+        <div>
+          <Input
+            data-test-id="company-name-input"
+            disabled={disabled}
+            error={!!formErrors.companyName}
+            helperText={getErrorMessage(formErrors.companyName, intl)}
+            label={intl.formatMessage({
+              id: "9YazHG",
+              defaultMessage: "Company",
+            })}
+            name="companyName"
+            onChange={onChange}
+            value={data.companyName}
+            width="100%"
+            spellCheck={false}
+            autoComplete="new-password"
+          />
+        </div>
       </Box>
+      <Box display="grid" gap={2} __gridTemplateColumns="1fr 1fr">
+        <div>
+          <Combobox
+            data-test-id="address-edit-country-select-field"
+            autoComplete="off"
+            spellCheck={false}
+            disabled={disabled}
+            error={!!formErrors.country}
+            helperText={getErrorMessage(formErrors.country, intl)}
+            label={intl.formatMessage({
+              id: "vONi+O",
+              defaultMessage: "Country",
+            })}
+            options={countries}
+            name="country"
+            value={{
+              label: countryDisplayValue,
+              value: data.country,
+            }}
+            onChange={v =>
+              onCountryChange({
+                target: {
+                  name: "country",
+                  value: v?.value ?? "",
+                },
+              } as ChangeEvent<any>)
+            }
+          />
+        </div>
+        <div>
+          {isFieldAllowed(PossibleFormFields.COUNTRY_AREA) && (
+            <Combobox
+              data-test-id="address-edit-country-area-field"
+              autoComplete="off"
+              spellCheck={false}
+              disabled={disabled}
+              error={!!formErrors.countryArea}
+              helperText={getErrorMessage(formErrors.countryArea, intl)}
+              label={intl.formatMessage({
+                id: "AuwpCm",
+                defaultMessage: "Country area",
+              })}
+              options={areas}
+              name="countryArea"
+              value={{
+                label: getDisplayValue(data.countryArea),
+                value: data.countryArea,
+              }}
+              onChange={v =>
+                onChange({
+                  target: {
+                    name: "countryArea",
+                    value: v?.value ?? "",
+                  },
+                } as ChangeEvent<any>)
+              }
+            />
+          )}
+        </div>
+      </Box>
+      <Box display="grid" gap={2} __gridTemplateColumns="1fr 1fr">
+        <div>
+          <Input
+            disabled={disabled}
+            data-test-id="city-input"
+            error={!!formErrors.city}
+            helperText={getErrorMessage(formErrors.city, intl)}
+            label={intl.formatMessage({
+              id: "TE4fIS",
+              defaultMessage: "City",
+            })}
+            name="city"
+            onChange={onChange}
+            value={data.city}
+            width="100%"
+            spellCheck={false}
+            autoComplete="new-password"
+          />
+        </div>
+        <div>
+          <Input
+            disabled={disabled}
+            data-test-id="city-area-input"
+            error={!!formErrors.cityArea}
+            helperText={getErrorMessage(formErrors.cityArea, intl)}
+            label={intl.formatMessage({
+              id: "joyCvB",
+              defaultMessage: "District (区/县)",
+            })}
+            name="cityArea"
+            onChange={onChange}
+            value={data.cityArea ?? ""}
+            width="100%"
+            spellCheck={false}
+            autoComplete="new-password"
+          />
+        </div>
+      </Box>
+      <Input
+        disabled={disabled}
+        data-test-id="zip-input"
+        error={!!formErrors.postalCode}
+        helperText={getErrorMessage(formErrors.postalCode, intl)}
+        label={intl.formatMessage({
+          id: "oYGfnY",
+          defaultMessage: "ZIP / Postal code",
+        })}
+        name="postalCode"
+        onChange={onChange}
+        value={data.postalCode}
+        width="100%"
+        spellCheck={false}
+        autoComplete="new-password"
+      />
       <Input
         disabled={disabled}
         data-test-id="address-line-1-input"
@@ -149,106 +250,6 @@ export const AddressEdit = (props: AddressEditProps) => {
         spellCheck={false}
         autoComplete="new-password"
       />
-      <Box display="grid" gap={2} __gridTemplateColumns="1fr 1fr">
-        <div>
-          <Input
-            disabled={disabled}
-            data-test-id="city-input"
-            error={!!formErrors.city}
-            helperText={getErrorMessage(formErrors.city, intl)}
-            label={intl.formatMessage({
-              id: "TE4fIS",
-              defaultMessage: "City",
-            })}
-            name="city"
-            onChange={onChange}
-            value={data.city}
-            width="100%"
-            spellCheck={false}
-            autoComplete="new-password"
-          />
-        </div>
-        <div>
-          <Input
-            disabled={disabled}
-            data-test-id="zip-input"
-            error={!!formErrors.postalCode}
-            label={intl.formatMessage({
-              id: "oYGfnY",
-              defaultMessage: "ZIP / Postal code",
-            })}
-            name="postalCode"
-            onChange={onChange}
-            value={data.postalCode}
-            width="100%"
-            spellCheck={false}
-            autoComplete="new-password"
-          />
-        </div>
-      </Box>
-
-      <Box display="grid" gap={2} __gridTemplateColumns="1fr 1fr">
-        <div>
-          <Combobox
-            data-test-id="address-edit-country-select-field"
-            autoComplete="off"
-            spellCheck={false}
-            disabled={disabled}
-            error={!!formErrors.country}
-            helperText={getErrorMessage(formErrors.country, intl)}
-            label={intl.formatMessage({
-              id: "vONi+O",
-              defaultMessage: "Country",
-            })}
-            options={countries}
-            name="country"
-            value={{
-              label: countryDisplayValue,
-              value: data.country,
-            }}
-            onChange={v =>
-              onCountryChange({
-                target: {
-                  name: "country",
-                  value: v?.value ?? "",
-                },
-                // must assert, we use fake event because Combobox doesn't expose inner event, and upper handlers require it
-              } as ChangeEvent<any>)
-            }
-          />
-        </div>
-        <div>
-          {isFieldAllowed(PossibleFormFields.COUNTRY_AREA) && (
-            <Combobox
-              data-test-id="address-edit-country-area-field"
-              autoComplete="off"
-              spellCheck={false}
-              disabled={disabled}
-              error={!!formErrors.countryArea}
-              helperText={getErrorMessage(formErrors.countryArea, intl)}
-              label={intl.formatMessage({
-                id: "AuwpCm",
-                defaultMessage: "Country area",
-              })}
-              options={areas}
-              name="countryArea"
-              value={{
-                label: getDisplayValue(data.countryArea),
-                value: data.countryArea,
-              }}
-              onChange={v =>
-                onChange({
-                  target: {
-                    name: "countryArea",
-                    value: v?.value ?? "",
-                  },
-                  // must cast, we use fake event because Combobox doesn't expose inner event, and upper handlers require it
-                } as ChangeEvent<any>)
-              }
-            />
-          )}
-        </div>
-      </Box>
     </>
   );
 };
