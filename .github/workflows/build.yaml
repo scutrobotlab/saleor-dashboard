@@ -27,11 +27,30 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push
+      - name: Build and Push Pre
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
+          build-args: |
+            API_URL=https://store-pre.scutbot.cn/graphql/
+            APP_MOUNT_URI=/
+            STATIC_URL=/
+            LOCALE_CODE=zh-Hans
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:pre
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.sha }}
+
+      - name: Build and Push Prod
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            API_URL=https://store.scutbot.cn/graphql/
+            APP_MOUNT_URI=/
+            STATIC_URL=/
+            LOCALE_CODE=zh-Hans
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:prod
             ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.sha }}
