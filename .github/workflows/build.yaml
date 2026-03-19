@@ -33,7 +33,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            API_URL=https://store-pre.scutbot.cn/graphql/
+            API_URL=https://store-dashboard-pre.scutbot.cn/graphql/
             APP_MOUNT_URI=/
             STATIC_URL=/
             LOCALE_CODE=zh-Hans
@@ -47,7 +47,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            API_URL=https://store.scutbot.cn/graphql/
+            API_URL=https://store-dashboard.scutbot.cn/graphql/
             APP_MOUNT_URI=/
             STATIC_URL=/
             LOCALE_CODE=zh-Hans
